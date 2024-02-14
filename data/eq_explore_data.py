@@ -28,5 +28,5 @@ for eq_dict in all_eq_dicts:
     mag = eq_dict['properties']['mag']
     mags.append(mag)
 
-# Display the first 5 magnitudes
-print(mags[:5])
+# Display the first 10 magnitudes
+print(mags[:10])
