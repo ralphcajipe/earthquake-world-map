@@ -36,3 +36,17 @@ for eq_dict in all_eq_dicts:
 print(f"Magnitudes: {mags[:10]}")
 print(f"Longitudes (x): {lons[:5]}")
 print(f"Latitudes (y): {lats[:5]}")
+
+from plotly.graph_objs import Scattergeo, Layout
+from plotly import offline
+
+# Map the earthquakes
+data = [Scattergeo(lon=lons, lat=lats)]
+my_layout = Layout(title='Global Earthquakes')
+
+fig = {'data': data, 
+       'layout': my_layout}
+
+# Render HTML fule
+offline.plot(fig, filename='global_earthquakes.html')
+
