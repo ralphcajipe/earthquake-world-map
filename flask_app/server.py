@@ -3,9 +3,10 @@ import json
 from plotly.graph_objs import Layout
 from plotly import offline
 
-app = Flask(__name__, static_url_path='')
+app = Flask(__name__, static_url_path="")
 
-@app.route('/')
+
+@app.route("/")
 def home():
     filename = "data/eq_data_1_day_m4_5.json"
     with open(filename, "r", encoding="utf-8") as f:
@@ -36,11 +37,38 @@ def home():
         "colorbar": {"title": "Magnitude", "len": 0.5, "thickness": 20},
     }
 
-    my_layout = Layout(title="Global Earthquakes")
+    my_layout = Layout(
+        title={"text": "Global Earthquakes", "x": 0.5},
+        annotations=[
+            {
+                "text": "The visualization includes data for all earthquakes with a magnitude M4.5 or greater that took place in the last 24 hours (as of Feb 5, 2024).",
+                "showarrow": False,
+                "xref": "paper",
+                "yref": "paper",
+                "x": 0.5,
+                "y": 1.05,
+                "xanchor": "center",
+                "yanchor": "top",
+                "font": {"size": 12},
+            },
+            {
+                "text": "Created by Stephen Camilon and Ralph Cajipe",
+                "showarrow": False,
+                "xref": "paper",
+                "yref": "paper",
+                "x": 0.5,
+                "y": -0.1,
+                "xanchor": "center",
+                "yanchor": "top",
+                "font": {"size": 12},
+            },
+        ],
+    )
     fig = {"data": data, "layout": my_layout}
-    offline.plot(fig, filename='static/global_earthquakes.html')
+    offline.plot(fig, filename="static/global_earthquakes.html")
 
-    return send_from_directory('static', 'global_earthquakes.html')
+    return send_from_directory("static", "global_earthquakes.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
