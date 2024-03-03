@@ -1,4 +1,7 @@
 import json
+from plotly.graph_objs import Scattergeo, Layout
+from plotly import offline
+
 
 filename = "data/eq_data_1_day_m4_5.json"
 
@@ -21,7 +24,7 @@ with open(readable_filename, "r", encoding="utf-8") as f:
 all_eq_dicts = all_eq_data["features"]
 print(len(all_eq_dicts))
 
-mags, lons, lats = [], [], []
+mags, lons, lats, hover_texts = [], [], [], []
 
 
 # Extract the magnitude, location data (longitude and latitude) of each earthquake
@@ -29,24 +32,19 @@ for eq_dict in all_eq_dicts:
     mag = eq_dict["properties"]["mag"]
     lon = eq_dict["geometry"]["coordinates"][0]
     lat = eq_dict["geometry"]["coordinates"][1]
+    title = eq_dict["properties"]["title"]
     mags.append(mag)
     lons.append(lon)
     lats.append(lat)
+    hover_texts.append(title)
 
 # Display the first 10 magnitudes, first 5 longitudes, and first 5 latitudes
 print(f"Magnitudes: {mags[:10]}")
 print(f"Longitudes (x): {lons[:5]}")
 print(f"Latitudes (y): {lats[:5]}")
 
-from plotly.graph_objs import Scattergeo, Layout
-from plotly import offline
-
 # Map the earthquakes
-data = {
-    'type': 'scattergeo',
-    'lon': lons,
-    'lat': lats
-}
+data = {"type": "scattergeo", "lon": lons, "lat": lats, "text": hover_texts}
 
 # Define the scale factor
 scale_factor = 5
@@ -56,23 +54,46 @@ scaled_mags = [mag * scale_factor for mag in mags]
 
 # Create a nested dictionary for the marker settings
 marker_settings = {
-    'size': scaled_mags,
+    "size": scaled_mags,
     # Add other marker settings here if needed
 }
 
 # Update the 'data' dictionary with the marker settings
-data['marker'] = {
-    'size': scaled_mags,
-    'color': mags,  # Use the magnitude values as the marker color
-    'colorscale': 'viridis',  # Use the Viridis color scale
-    'reversescale': True,  # Reverse the color scale
-    'colorbar': {'title': 'Magnitude', 'len': 0.5, 'thickness': 20},  # Add a colorbar with title 'Magnitude'
+data["marker"] = {
+    "size": scaled_mags,
+    "color": mags,  # Use the magnitude values as the marker color
+    "colorscale": "viridis",  # Use the Viridis color scale
+    "reversescale": True,  # Reverse the color scale
+    "colorbar": {
+        "title": "Magnitude",
+        "len": 0.5,
+        "thickness": 20,
+    },  # Add a colorbar with title 'Magnitude'
 }
 
-my_layout = Layout(title='Global Earthquakes')
+my_layout = Layout(
+    title={"text": "Global Earthquakes", "x": 0.5},
+    annotations=[
+        {
+            "text": "The visualization includes data for all earthquakes with a magnitude M4.5 or greater that took place in the last 24 hours (as of Feb 5, 2024).",
+            "showarrow": False,
+            "xref": "paper", "yref": "paper",
+            "x": 0.5, "y": 1.05,
+            "xanchor": "center", "yanchor": "top",
+            "font": {"size": 12},
+        },
+        {
+            "text": "Created by Stephen Camilon and Ralph Cajipe",
+            "showarrow": False,
+            "xref": "paper", "yref": "paper",
+            "x": 0.5, "y": -0.1,
+            "xanchor": "center", "yanchor": "top",
+            "font": {"size": 12},
+        }
+    ]
+)
 
-fig = {'data': data, 
-       'layout': my_layout}
+fig = {"data": data, "layout": my_layout}
 
 # Render HTML file
-offline.plot(fig, filename='global_earthquakes.html')
+offline.plot(fig, filename="global_earthquakes.html")
