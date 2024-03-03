@@ -23,6 +23,7 @@ print(len(all_eq_dicts))
 
 mags, lons, lats = [], [], []
 
+
 # Extract the magnitude, location data (longitude and latitude) of each earthquake
 for eq_dict in all_eq_dicts:
     mag = eq_dict["properties"]["mag"]
@@ -41,12 +42,37 @@ from plotly.graph_objs import Scattergeo, Layout
 from plotly import offline
 
 # Map the earthquakes
-data = [Scattergeo(lon=lons, lat=lats)]
+data = {
+    'type': 'scattergeo',
+    'lon': lons,
+    'lat': lats
+}
+
+# Define the scale factor
+scale_factor = 5
+
+# Multiply the magnitude by the scale factor to adjust marker size
+scaled_mags = [mag * scale_factor for mag in mags]
+
+# Create a nested dictionary for the marker settings
+marker_settings = {
+    'size': scaled_mags,
+    # Add other marker settings here if needed
+}
+
+# Update the 'data' dictionary with the marker settings
+data['marker'] = {
+    'size': scaled_mags,
+    'color': mags,  # Use the magnitude values as the marker color
+    'colorscale': 'viridis',  # Use the Viridis color scale
+    'reversescale': True,  # Reverse the color scale
+    'colorbar': {'title': 'Magnitude', 'len': 0.5, 'thickness': 20},  # Add a colorbar with title 'Magnitude'
+}
+
 my_layout = Layout(title='Global Earthquakes')
 
 fig = {'data': data, 
        'layout': my_layout}
 
-# Render HTML fule
+# Render HTML file
 offline.plot(fig, filename='global_earthquakes.html')
-
